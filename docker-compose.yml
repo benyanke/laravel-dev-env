@@ -8,25 +8,20 @@ services:
       - MARIADB_USER=my_user
       - MARIADB_DATABASE=my_database
       - MARIADB_PASSWORD=my_password
-    ports:
-      - 3306
-    # volumes:
-    #  - ./.tmp/dbvol/:/bitnami/mariadb/data
 
-  app:
+  myapp:
     tty: true
     image: 'bitnami/laravel:latest'
     labels:
       kompose.service.type: nodeport
     environment:
-      - DB_HOST=db
+      - DB_HOST=mariadb
       - DB_USERNAME=my_user
       - DB_DATABASE=my_database
       - DB_PASSWORD=my_password
     depends_on:
       - mariadb
     ports:
-      - 3000
+      - 3000:3000
     volumes:
-      - ./www/:/app
-      - ./.tmp/composer-cache/:/home/bitnami/.composer
+      - ./www:/app
