@@ -2,18 +2,31 @@ version: '2'
 
 services:
   mariadb:
-    image: 'mariadb:10'
+    image: 'bitnami/mariadb:latest'
     environment:
-      - MYSQL_ROOT_PASSWORD=picMesicFekcagVesItejzeic
-      - MYSQL_DATABASE=laravel
-      - MYSQL_USER=laravel
-      - MYSQL_PASSWORD=ThwefWockKouptom5dreykGhop
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_USER=my_user
+      - MARIADB_DATABASE=my_database
+      - MARIADB_PASSWORD=my_password
+    ports:
+      - 3306
+    # volumes:
+    #  - ./.tmp/dbvol/:/bitnami/mariadb/data
 
   app:
-    image: 'php:fpm-alpine'
+    tty: true
+    image: 'bitnami/laravel:latest'
+    labels:
+      kompose.service.type: nodeport
+    environment:
+      - DB_HOST=db
+      - DB_USERNAME=my_user
+      - DB_DATABASE=my_database
+      - DB_PASSWORD=my_password
     depends_on:
       - mariadb
     ports:
-      - 3000:9000
+      - 3000
     volumes:
-      - ./www/:/var/www/html
+      - ./www/:/app
+      - ./.tmp/composer-cache/:/home/bitnami/.composer
