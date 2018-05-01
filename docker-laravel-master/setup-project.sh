@@ -1,6 +1,5 @@
 #!/bin/bash
 
-. ./docker-laravel-aliases.sh
 alias dc-up="docker-compose up -d nginx mysql redis"
 alias dc-down="docker-compose down"
 alias dc-art="docker-compose run --rm artisan"
