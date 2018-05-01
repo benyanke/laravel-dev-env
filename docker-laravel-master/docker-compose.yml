@@ -7,7 +7,8 @@ version: '2'
 services:
   nginx:
     container_name: ${APP_NAME}-httpd
-    image: vcarreira/nginx-php5-fpm
+    image: vcarreira/nginx-php7-fpm
+    # image: vcarreira/nginx-php5-fpm
     ports:
       - 80:80
     volumes:
@@ -19,6 +20,10 @@ services:
       - redis:${REDIS_HOST}
     networks:
       - laravel-network
+    depends_on:
+      - mysql
+      - redis
+      - queue-daemon
 
   mysql:
     container_name: ${APP_NAME}-db
@@ -68,6 +73,8 @@ services:
       - mysql:${DB_HOST}
     networks:
       - laravel-network
+    depends_on:
+      - mysql
 
   adminer:
     container_name: ${APP_NAME}-adminer
@@ -84,6 +91,8 @@ services:
       - mysql:${DB_HOST}
     networks:
       - laravel-network
+    depends_on:
+      - mysql
 
   queue-daemon:
     container_name: ${APP_NAME}-queue-daemon
@@ -98,6 +107,9 @@ services:
       - redis:${REDIS_HOST}
     networks:
       - laravel-network
+    depends_on:
+      - mysql
+      - redis
 
   # one-off containers
   # call docker-compose rm -a -f after docker-compose up to remove all one-off containers
