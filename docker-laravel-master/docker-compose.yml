@@ -27,6 +27,7 @@ services:
       - mysql
       - redis
       - queue-daemon
+      - phpmyadmin
 
   mysql:
     container_name: ${APP_NAME}-db
@@ -57,39 +58,16 @@ services:
     networks:
       - laravel-network
 
-  # built-in containers
-  mysql-backup:
-    container_name: ${APP_NAME}-db-cron-backup
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: ${APP_NAME}-pma
     environment:
-      - DB_DATABASE=${DB_DATABASE}
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-    build:
-      context: ./docker/osx
-      dockerfile: mysqldump-cron.dockerfile
-    volumes:
-      - ./docker/db-backups:/mysql-backups
-      - /docker-server/${APP_NAME}-db:/var/lib/mysql
-    links:
-      - mysql:${DB_HOST}
-    networks:
-      - laravel-network
-    depends_on:
-      - mysql
-
-  adminer:
-    container_name: ${APP_NAME}-adminer
-    build:
-      context: ./docker/adminer
-      dockerfile: adminer.dockerfile
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - PMA_HOST=${DB_HOST}
+      - PMA_PORT=${DB_PORT}
     ports:
       - 81:80
-    volumes:
-      - ./docker/adminer/sites:/etc/nginx/sites-enabled
-      - ./docker/adminer/www:/var/www
-      - ./docker/nginx/logs:/var/log/nginx/
     links:
       - mysql:${DB_HOST}
     networks:
@@ -110,9 +88,6 @@ services:
       - redis:${REDIS_HOST}
     networks:
       - laravel-network
-    depends_on:
-      - mysql
-      - redis
 
   # one-off containers
   # call docker-compose rm -a -f after docker-compose up to remove all one-off containers
