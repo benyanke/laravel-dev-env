@@ -13,7 +13,7 @@ services:
     ports:
       - 80:80
     volumes:
-      - ./project:/var/www
+      - ./www:/var/www
       - ./docker/nginx/sites:/etc/nginx/sites-enabled
       - ./docker/nginx/logs:/var/log/nginx/
       - ./docker/nginx/snippets:/etc/nginx/snippets
@@ -103,7 +103,7 @@ services:
       context: ./docker/laravel-queue
       dockerfile: laravel-queue.dockerfile
     volumes:
-      - ./project:/var/www
+      - ./www:/var/www
       - ./docker/laravel-queue/logs:/var/log/supervisor
     links:
       - mysql:${DB_HOST}
@@ -120,27 +120,33 @@ services:
   artisan:
     image: vcarreira/artisan
     volumes:
-      - ./project:/var/www
+      - ./www:/var/www
     links:
       - mysql:${DB_HOST}
       - redis:${REDIS_HOST}
     networks:
       - laravel-network
+    depends_on:
+      - mysql
+      - redis
 
   phpunit:
     image: vcarreira/phpunit
     volumes:
-      - ./project:/var/www
+      - ./www:/var/www
     links:
       - mysql:${DB_HOST}
       - redis:${REDIS_HOST}
     networks:
       - laravel-network
+    depends_on:
+      - mysql
+      - redis
 
   phpspec:
     image: vcarreira/phpspec
     volumes:
-      - ./project:/var/www
+      - ./www:/var/www
     links:
       - mysql:${DB_HOST}
       - redis:${REDIS_HOST}
@@ -150,14 +156,14 @@ services:
   composer:
     image: vcarreira/composer
     volumes:
-      - ./project:/var/www
+      - ./www:/var/www
     networks:
       - laravel-network
 
   node:
     image: vcarreira/node
     volumes:
-      - ./project:/var/www
+      - ./www:/var/www
     networks:
       - laravel-network
 
