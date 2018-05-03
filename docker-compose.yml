@@ -1,27 +1,147 @@
 version: '2'
+# ************ README ****************
+# Reads env vars from .env
+# Requires docker-compose version 1.7+
+# ************************************
 
 services:
-  mariadb:
-    image: 'bitnami/mariadb:latest'
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-      - MARIADB_USER=my_user
-      - MARIADB_DATABASE=my_database
-      - MARIADB_PASSWORD=my_password
-
-  myapp:
-    tty: true
-    image: 'bitnami/laravel:latest'
-    labels:
-      kompose.service.type: nodeport
-    environment:
-      - DB_HOST=mariadb
-      - DB_USERNAME=my_user
-      - DB_DATABASE=my_database
-      - DB_PASSWORD=my_password
-    depends_on:
-      - mariadb
+  # Webserver
+  app:
+    container_name: ${APP_NAME}-httpd
+    image: vcarreira/nginx-php7-fpm
+    # image: vcarreira/nginx-php5-fpm
     ports:
-      - 3000:3000
+      - 80:80
     volumes:
-      - ./www:/app
+      - ./www:/var/www
+      - ./docker/nginx/sites:/etc/nginx/sites-enabled
+      - ./docker/nginx/logs:/var/log/nginx/
+      - ./docker/nginx/snippets:/etc/nginx/snippets
+      - ./docker/nginx/fpm/pool.d:/etc/php/7.1/fpm/pool.d
+    links:
+      - mysql:${DB_HOST}
+      - redis:${REDIS_HOST}
+    networks:
+      - laravel-network
+    depends_on:
+      - mysql
+      - redis
+      - queue-daemon
+      - phpmyadmin
+
+  mysql:
+    container_name: ${APP_NAME}-db
+    image: mysql
+    expose:
+      - 3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=type-a-db-root-password
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - /docker-server/${APP_NAME}-db:/var/lib/mysql
+    networks:
+      - laravel-network
+
+  redis:
+    container_name: ${APP_NAME}-redis
+    image: vcarreira/redis
+    expose:
+      - 6379
+    environment:
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    command: redis-server --appendonly yes
+    volumes:
+      - ./docker/redis:/data
+    networks:
+      - laravel-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    container_name: ${APP_NAME}-pma
+    environment:
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - PMA_HOST=${DB_HOST}
+      - PMA_PORT=${DB_PORT}
+    ports:
+      - 81:80
+    links:
+      - mysql:${DB_HOST}
+    networks:
+      - laravel-network
+    depends_on:
+      - mysql
+
+  queue-daemon:
+    container_name: ${APP_NAME}-queue-daemon
+    build:
+      context: ./docker/laravel-queue
+      dockerfile: laravel-queue.dockerfile
+    volumes:
+      - ./www:/var/www
+      - ./docker/laravel-queue/logs:/var/log/supervisor
+    links:
+      - mysql:${DB_HOST}
+      - redis:${REDIS_HOST}
+    networks:
+      - laravel-network
+
+  # one-off containers
+  # call docker-compose rm -a -f after docker-compose up to remove all one-off containers
+  # or simply use the alias dcup
+  artisan:
+    image: vcarreira/artisan
+    volumes:
+      - ./www:/var/www
+    links:
+      - mysql:${DB_HOST}
+      - redis:${REDIS_HOST}
+    networks:
+      - laravel-network
+    depends_on:
+      - mysql
+      - redis
+
+  phpunit:
+    image: vcarreira/phpunit
+    volumes:
+      - ./www:/var/www
+    links:
+      - mysql:${DB_HOST}
+      - redis:${REDIS_HOST}
+    networks:
+      - laravel-network
+    depends_on:
+      - mysql
+      - redis
+
+  phpspec:
+    image: vcarreira/phpspec
+    volumes:
+      - ./www:/var/www
+    links:
+      - mysql:${DB_HOST}
+      - redis:${REDIS_HOST}
+    networks:
+      - laravel-network
+
+  composer:
+    image: vcarreira/composer
+    volumes:
+      - ./www:/var/www
+    networks:
+      - laravel-network
+
+  node:
+    image: vcarreira/node
+    volumes:
+      - ./www:/var/www
+    networks:
+      - laravel-network
+
+networks:
+  laravel-network:
+    driver: bridge
