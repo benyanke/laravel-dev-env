@@ -1,4 +1,4 @@
-alias dc-up="docker-compose up -d nginx"
+alias dc-up="docker-compose up -d app"
 # alias dc-up="docker-compose up -d nginx mysql redis queue-daemon"
 alias dc-down="docker-compose down"
 alias dc-art="docker-compose run --rm artisan"

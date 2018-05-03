@@ -5,7 +5,8 @@ version: '2'
 # ************************************
 
 services:
-  nginx:
+  # Webserver
+  app:
     container_name: ${APP_NAME}-httpd
     image: vcarreira/nginx-php7-fpm
     # image: vcarreira/nginx-php5-fpm
@@ -15,6 +16,8 @@ services:
       - ./project:/var/www
       - ./docker/nginx/sites:/etc/nginx/sites-enabled
       - ./docker/nginx/logs:/var/log/nginx/
+      - ./docker/nginx/snippets:/etc/nginx/snippets
+      - ./docker/nginx/fpm/pool.d:/etc/php/7.1/fpm/pool.d
     links:
       - mysql:${DB_HOST}
       - redis:${REDIS_HOST}
