@@ -132,6 +132,8 @@ services:
     image: vcarreira/composer
     volumes:
       - ./www:/var/www
+      # - ./docker/.tmp/composer/cache:/root/.composer/cache
+      - ./docker/.tmp/composer:/root/.composer
     networks:
       - laravel-network
 
