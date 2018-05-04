@@ -9,7 +9,6 @@ services:
   app:
     container_name: ${COMPOSE_APP_NAME}-httpd
     image: vcarreira/nginx-php7-fpm
-    # image: vcarreira/nginx-php5-fpm
     ports:
       - 80:80
     volumes:
@@ -19,17 +18,17 @@ services:
       - ./docker/nginx/snippets:/etc/nginx/snippets
       - ./docker/nginx/fpm/pool.d:/etc/php/7.1/fpm/pool.d
     links:
-      - mysql:${DB_HOST}
+      - db:${DB_HOST}
       - redis:${REDIS_HOST}
     networks:
       - laravel-network
     depends_on:
-      - mysql
+      - db
       - redis
       - queue-daemon
       - phpmyadmin
 
-  mysql:
+  db:
     container_name: ${COMPOSE_APP_NAME}-db
     image: mariadb:latest
     expose:
@@ -64,22 +63,17 @@ services:
     environment:
       - PMA_ARBITRARY=1
       - PMA_HOST=${DB_HOST}
-      # - PMA_USER=${DB_USER}
-      # - PMA_USER=humanworx
       - PMA_USER=root
-      # - PMA_PASSWORD=${DB_PASS}
-      # - PMA_PASSWORD=nefIlUrburyokCopEujEp9
       - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      # - PMA_PORT=${DB_PORT}
-      - PMA_PORT=3306
+      - PMA_PORT=${DB_PORT}
     ports:
       - 81:80
     links:
-      - mysql:${DB_HOST}
+      - db:${DB_HOST}
     networks:
       - laravel-network
     depends_on:
-      - mysql
+      - db
 
   queue-daemon:
     container_name: ${COMPOSE_APP_NAME}-queue-daemon
@@ -90,7 +84,7 @@ services:
       - ./www:/var/www
       - ./docker/laravel-queue/logs:/var/log/supervisor
     links:
-      - mysql:${DB_HOST}
+      - db:${DB_HOST}
       - redis:${REDIS_HOST}
     networks:
       - laravel-network
@@ -103,12 +97,12 @@ services:
     volumes:
       - ./www:/var/www
     links:
-      - mysql:${DB_HOST}
+      - db:${DB_HOST}
       - redis:${REDIS_HOST}
     networks:
       - laravel-network
     depends_on:
-      - mysql
+      - db
       - redis
 
   phpunit:
@@ -116,12 +110,12 @@ services:
     volumes:
       - ./www:/var/www
     links:
-      - mysql:${DB_HOST}
+      - db:${DB_HOST}
       - redis:${REDIS_HOST}
     networks:
       - laravel-network
     depends_on:
-      - mysql
+      - db
       - redis
 
   phpspec:
@@ -129,7 +123,7 @@ services:
     volumes:
       - ./www:/var/www
     links:
-      - mysql:${DB_HOST}
+      - db:${DB_HOST}
       - redis:${REDIS_HOST}
     networks:
       - laravel-network
