@@ -10,7 +10,7 @@ services:
     container_name: ${COMPOSE_APP_NAME}-httpd
     image: vcarreira/nginx-php7-fpm
     ports:
-      - 80:80
+      - 80
     volumes:
       - ./www:/var/www
       - ./docker/nginx/sites:/etc/nginx/sites-enabled
@@ -36,8 +36,8 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${DB_NAME}
-      - MYSQL_USER=${DB_USER}
-      - MYSQL_PASSWORD=${DB_PASS}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
     volumes:
       - ./docker/.tmp/db-data:/var/lib/mysql
     networks:
@@ -58,7 +58,7 @@ services:
       - laravel-network
 
   phpmyadmin:
-    image: phpmyadmin/phpmyadmin:latest
+    image: phpmyadmin/phpmyadmin:edge
     container_name: ${COMPOSE_APP_NAME}-pma
     environment:
       - PMA_ARBITRARY=1
@@ -67,7 +67,8 @@ services:
       - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - PMA_PORT=${DB_PORT}
     ports:
-      - 81:80
+      - 80
+      - 3306
     links:
       - db:${DB_HOST}
     networks:
@@ -95,7 +96,7 @@ services:
   artisan:
     image: vcarreira/artisan
     volumes:
-      - ./www:/var/www
+      - ./www/laravel:/var/www
     links:
       - db:${DB_HOST}
       - redis:${REDIS_HOST}
@@ -131,7 +132,7 @@ services:
   composer:
     image: vcarreira/composer
     volumes:
-      - ./www:/var/www
+      - ./www/laravel:/var/www
       # - ./docker/.tmp/composer/cache:/root/.composer/cache
       - ./docker/.tmp/composer:/root/.composer
     networks:
@@ -140,7 +141,7 @@ services:
   node:
     image: vcarreira/node
     volumes:
-      - ./www:/var/www
+      - ./www/laravel:/var/www
     networks:
       - laravel-network
 
