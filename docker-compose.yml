@@ -7,7 +7,7 @@ version: '2'
 services:
   # Webserver
   app:
-    container_name: ${APP_NAME}-httpd
+    container_name: ${COMPOSE_APP_NAME}-httpd
     image: vcarreira/nginx-php7-fpm
     # image: vcarreira/nginx-php5-fpm
     ports:
@@ -30,22 +30,22 @@ services:
       - phpmyadmin
 
   mysql:
-    container_name: ${APP_NAME}-db
-    image: mysql
+    container_name: ${COMPOSE_APP_NAME}-db
+    image: mariadb:latest
     expose:
       - 3306
     environment:
-      - MYSQL_ROOT_PASSWORD=type-a-db-root-password
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${DB_NAME}
-      - MYSQL_USER=${DB_USERNAME}
-      - MYSQL_PASSWORD=${DB_PASSWORD}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASS}
     volumes:
-      - /docker-server/${APP_NAME}-db:/var/lib/mysql
+      - ./docker/.tmp/db-data:/var/lib/mysql
     networks:
       - laravel-network
 
   redis:
-    container_name: ${APP_NAME}-redis
+    container_name: ${COMPOSE_APP_NAME}-redis
     image: vcarreira/redis
     expose:
       - 6379
@@ -60,14 +60,18 @@ services:
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
-    container_name: ${APP_NAME}-pma
+    container_name: ${COMPOSE_APP_NAME}-pma
     environment:
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - PMA_ARBITRARY=1
       - PMA_HOST=${DB_HOST}
-      - PMA_PORT=${DB_PORT}
-      - PMA_USER=${DB_USERNAME}
-      - PMA_PASSWORD=${DB_PASSWORD}
+      # - PMA_USER=${DB_USER}
+      # - PMA_USER=humanworx
+      - PMA_USER=root
+      # - PMA_PASSWORD=${DB_PASS}
+      # - PMA_PASSWORD=nefIlUrburyokCopEujEp9
+      - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      # - PMA_PORT=${DB_PORT}
+      - PMA_PORT=3306
     ports:
       - 81:80
     links:
@@ -78,7 +82,7 @@ services:
       - mysql
 
   queue-daemon:
-    container_name: ${APP_NAME}-queue-daemon
+    container_name: ${COMPOSE_APP_NAME}-queue-daemon
     build:
       context: ./docker/laravel-queue
       dockerfile: laravel-queue.dockerfile
