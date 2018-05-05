@@ -1,0 +1,26 @@
+# Laravel Nginx Config File
+
+server {
+    listen 80;
+    server_name dev.local.grandcentral.pcnametag.com *.dev.local.grandcentral.pcnametag.com;
+
+    include /etc/nginx/snippets/logging.conf;
+#    include /etc/nginx/snippets/letsencrypt-handler.conf;
+    include /etc/nginx/snippets/index-handler.conf;
+    include /etc/nginx/snippets/php-locations.conf;
+    include /etc/nginx/snippets/disablecaching.conf;
+
+    root /var/www/laravel/public;
+
+    index index.php index.html index.htm;
+
+    location / {
+            try_files $uri $uri/ /index.php?$query_string;
+
+            include /etc/nginx/snippets/disablecaching-loc.conf;
+
+    }
+
+
+}
+

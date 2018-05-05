@@ -1,0 +1,150 @@
+version: '2'
+# ************ README ****************
+# Reads env vars from .env
+# Requires docker-compose version 1.7+
+# ************************************
+
+services:
+  # Webserver
+  app:
+    container_name: ${COMPOSE_APP_NAME}-httpd
+    image: vcarreira/nginx-php7-fpm
+    ports:
+      - 80
+    volumes:
+      - ./www:/var/www
+      - ./docker/nginx/sites:/etc/nginx/sites-enabled
+      - ./docker/nginx/logs:/var/log/nginx/
+      - ./docker/nginx/snippets:/etc/nginx/snippets
+      - ./docker/nginx/fpm/pool.d:/etc/php/7.1/fpm/pool.d
+    links:
+      - db:${DB_HOST}
+      - redis:${REDIS_HOST}
+    networks:
+      - laravel-network
+    depends_on:
+      - db
+      - redis
+      - queue-daemon
+      - phpmyadmin
+
+  db:
+    container_name: ${COMPOSE_APP_NAME}-db
+    image: mariadb:latest
+    expose:
+      - 3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - ./docker/.tmp/db-data:/var/lib/mysql
+    networks:
+      - laravel-network
+
+  redis:
+    container_name: ${COMPOSE_APP_NAME}-redis
+    image: vcarreira/redis
+    expose:
+      - 6379
+    environment:
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    command: redis-server --appendonly yes
+    volumes:
+      - ./docker/redis:/data
+    networks:
+      - laravel-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:edge
+    container_name: ${COMPOSE_APP_NAME}-pma
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=${DB_HOST}
+      - PMA_USER=root
+      - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - PMA_PORT=${DB_PORT}
+    ports:
+      - 80
+      - 3306
+    links:
+      - db:${DB_HOST}
+    networks:
+      - laravel-network
+    depends_on:
+      - db
+
+  queue-daemon:
+    container_name: ${COMPOSE_APP_NAME}-queue-daemon
+    build:
+      context: ./docker/laravel-queue
+      dockerfile: laravel-queue.dockerfile
+    volumes:
+      - ./www:/var/www
+      - ./docker/laravel-queue/logs:/var/log/supervisor
+    links:
+      - db:${DB_HOST}
+      - redis:${REDIS_HOST}
+    networks:
+      - laravel-network
+
+  # one-off containers
+  # call docker-compose rm -a -f after docker-compose up to remove all one-off containers
+  # or simply use the alias dcup
+  artisan:
+    image: vcarreira/artisan
+    volumes:
+      - ./www/laravel:/var/www
+    links:
+      - db:${DB_HOST}
+      - redis:${REDIS_HOST}
+    networks:
+      - laravel-network
+    depends_on:
+      - db
+      - redis
+
+  phpunit:
+    image: vcarreira/phpunit
+    volumes:
+      - ./www:/var/www
+    links:
+      - db:${DB_HOST}
+      - redis:${REDIS_HOST}
+    networks:
+      - laravel-network
+    depends_on:
+      - db
+      - redis
+
+  phpspec:
+    image: vcarreira/phpspec
+    volumes:
+      - ./www:/var/www
+    links:
+      - db:${DB_HOST}
+      - redis:${REDIS_HOST}
+    networks:
+      - laravel-network
+
+  composer:
+    image: vcarreira/composer
+    volumes:
+      - ./www/laravel:/var/www
+      # - ./docker/.tmp/composer/cache:/root/.composer/cache
+      - ./docker/.tmp/composer:/root/.composer
+    networks:
+      - laravel-network
+
+  node:
+    image: vcarreira/node
+    volumes:
+      - ./www/laravel:/var/www
+    networks:
+      - laravel-network
+
+networks:
+  laravel-network:
+    driver: bridge
