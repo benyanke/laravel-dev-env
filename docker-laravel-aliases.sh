@@ -14,3 +14,6 @@ alias dc-bower="docker-compose run --rm node bower"
 alias dc-backup="docker-compose up -d mysql-backup"
 alias dc-adminer="docker-compose up -d adminer"
 alias dc-queue="docker-compose up -d queue-daemon"
+
+
+alias logview="tail -f /var/www/laravel/storage/logs/laravel.log"
