@@ -7,7 +7,7 @@ version: '2'
 services:
   # Webserver
   app:
-    container_name: ${COMPOSE_APP_NAME}-httpd
+    container_name: ${DOCKER_COMPOSE_APP_NAME}-httpd
     image: vcarreira/nginx-php7-fpm
     ports:
       - 80
@@ -29,13 +29,13 @@ services:
       - phpmyadmin
 
   db:
-    container_name: ${COMPOSE_APP_NAME}-db
+    container_name: ${DOCKER_COMPOSE_APP_NAME}-db
     image: mariadb:latest
     expose:
       - 3306
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_DATABASE=${DB_DATABASE}
       - MYSQL_USER=${DB_USERNAME}
       - MYSQL_PASSWORD=${DB_PASSWORD}
     volumes:
@@ -44,7 +44,7 @@ services:
       - laravel-network
 
   redis:
-    container_name: ${COMPOSE_APP_NAME}-redis
+    container_name: ${DOCKER_COMPOSE_APP_NAME}-redis
     image: vcarreira/redis
     expose:
       - 6379
@@ -59,7 +59,7 @@ services:
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:edge
-    container_name: ${COMPOSE_APP_NAME}-pma
+    container_name: ${DOCKER_COMPOSE_APP_NAME}-pma
     environment:
       - PMA_ARBITRARY=1
       - PMA_HOST=${DB_HOST}
@@ -77,7 +77,7 @@ services:
       - db
 
   queue-daemon:
-    container_name: ${COMPOSE_APP_NAME}-queue-daemon
+    container_name: ${DOCKER_COMPOSE_APP_NAME}-queue-daemon
     build:
       context: ./docker/laravel-queue
       dockerfile: laravel-queue.dockerfile

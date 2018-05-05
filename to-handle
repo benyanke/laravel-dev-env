@@ -1,0 +1,7 @@
+Permissions (uuid) in containers (manage centrally - do more reading)
+Composer install problem on first run - need to bootstrap somehow, but while still keeping container prod ready (maybe that's not an issue
+Maybe add env var to http container to bootstrap (reset permissions, run composer and artisan commands)
+
+
+Install composer in http container
+
