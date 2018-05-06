@@ -17,3 +17,12 @@ alias dc-queue="docker-compose up -d queue-daemon"
 
 
 alias logview="tail -f /var/www/laravel/storage/logs/laravel.log"
+
+
+# To view all web-path logs on app server:
+docker-compose exec app tail -f /var/log/php7.1-fpm.log /var/log/nginx/* /var/www/laravel/storage/logs/*
+
+# Nginx access log
+docker-compose exec app tail -f /var/log/nginx/access.log
+
+

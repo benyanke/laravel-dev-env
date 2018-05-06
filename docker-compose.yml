@@ -10,7 +10,7 @@ services:
     container_name: ${DOCKER_COMPOSE_APP_NAME}-httpd
     image: vcarreira/nginx-php7-fpm
     ports:
-      - 80
+      - 8080:80
     volumes:
       - ./www:/var/www
       - ./docker/nginx/sites:/etc/nginx/sites-enabled
@@ -67,8 +67,7 @@ services:
       - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - PMA_PORT=${DB_PORT}
     ports:
-      - 80
-      - 3306
+      - 8081:80
     links:
       - db:${DB_HOST}
     networks:
