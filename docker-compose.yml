@@ -125,10 +125,11 @@ services:
       - db
       - redis
 
+  # This isn't fully there - keeping it so we can get it added later
   phpunit:
     image: vcarreira/phpunit
     volumes:
-      - ./www:/var/www
+      - ./www/:/var/www
     links:
       - db:${DB_HOST}
       - redis:${REDIS_HOST}
