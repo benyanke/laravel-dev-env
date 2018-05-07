@@ -10,16 +10,19 @@ env > /tmp/env
 # Run commands for bootstrapping dev env
 ##########
 
+
+export OWN_USER="www-data"
+
 # change www-data user to provided UID/GID
-usermod  -u $UID www-data
-groupmod -g $GID www-data
+usermod  -u "$UID" "$OWN_USER"
+groupmod -g "$GID" "$OWN_USER"
 
 # Fix filesystem permissions based on UID/GID provided by ENV
 if [ "$RUN_PERMISSION_FIX" = "1" ] ; then
   echo "Running permission fix";
-  # chown -R $UID:$GID "$CMD_DIR"
-  find "$CMD_DIR" -user "$UID" -exec chown -h foo {} \;
-  find "$CMD_DIR" -group "$GID" -exec chgrp -h foo {} \;
+  chown -R $UID:$GID "$CMD_DIR"
+  # find "$CMD_DIR" -user "$UID" -exec chown -h "$OWN_USER" {} \;
+  # find "$CMD_DIR" -group "$GID" -exec chgrp -h "$OWN_USER" {} \;
 else
   echo "Skipping permission fix";
 fi
