@@ -10,7 +10,7 @@ services:
     container_name: ${DOCKER_COMPOSE_APP_NAME}-httpd
     image: benyanke/nginx-php7-fpm:latest
     ports:
-      - 8080:80
+      - ${PORT_APP:-8080}:80
     # user: "${UID}:${GID}"
     expose:
       - 80
@@ -32,7 +32,7 @@ services:
       - ./docker/nginx/snippets:/etc/nginx/snippets
       - ./docker/nginx/fpm/pool.d:/etc/php/7.2/fpm/pool.d
       - ./docker/nginx/startup.sh:/opt/startup/startup.sh
-      # - ./docker/nginx/.tmp/composer/cache:[compose-cache-dir-here]
+      - ./docker/nginx/.tmp/composer/cache:/root/.composer/cache
       # - ./docker/nginx/.tmp/npm/cache:[npm-cache-dir-here]
     links:
       - db:${DB_HOST}
@@ -86,7 +86,7 @@ services:
       - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - PMA_PORT=${DB_PORT}
     ports:
-      - 8081:80
+      - ${PORT_PMA:-8081}:80
     links:
       - db:${DB_HOST}
     networks:

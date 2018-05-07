@@ -11,3 +11,11 @@ docker-compose up -d app
 
 to restart:
 docker-compose down; docker-compose up -d app
+
+
+
+To override default ports for frontend:
+
+PORT_APP = default 8080
+PORT_PMA = default 8081
+

@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # This runs on container startup.
 # Ensure it returns exit code 0, otherwise the container will not continue to startup.
 
@@ -12,6 +11,7 @@ env > /tmp/env
 
 
 export OWN_USER="www-data"
+export ARTISAN="/usr/bin/php /var/www/artisan"
 
 # change www-data user to provided UID/GID
 usermod  -u "$UID" "$OWN_USER"
@@ -31,7 +31,7 @@ fi
 # Composer install packages
 if [ "$RUN_COMPOSER" = "1" ] ; then
   echo "Running composer install";
-  (cd "$CMD_DIR" ; composer install --no-interaction )
+  (cd "$CMD_DIR" ; composer install --no-interaction --no-suggest)
 else
   echo "Skipping composer install";
 fi
@@ -48,7 +48,7 @@ fi
 # Run DB Migrations
 if [ "$RUN_MIGRATIONS" = "1" ] ; then
   echo "Running DB Migrations";
-  (cd "$CMD_DIR" ; artisan migrate )
+  (cd "$CMD_DIR" ; $ARTISAN migrate )
 else
   echo "Skipping DB Migrations";
 fi
@@ -56,7 +56,7 @@ fi
 # Run DB Seeder
 if [ "$RUN_DB_SEED" = "1" ] ; then
   echo "Running DB seeds";
-  (cd "$CMD_DIR" ; artisan db:seed --force )
+  (cd "$CMD_DIR" ; $ARTISAN db:seed --force )
 else
   echo "Skipping DB seeds";
 fi
@@ -65,7 +65,7 @@ fi
 # Run Vendor Publish
 if [ "$RUN_VENDOR_PUBLISH" = "1" ] ; then
   echo "Running Vendor Publish";
-  (cd "$CMD_DIR" ; artisan vendor:publish --all )
+  (cd "$CMD_DIR" ; $ARTISAN vendor:publish --all )
 else
   echo "Skipping Vendor Publish";
 fi
