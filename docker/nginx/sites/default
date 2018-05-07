@@ -2,7 +2,8 @@
 
 server {
     listen 80;
-    server_name dev.local.grandcentral.pcnametag.com *.dev.local.grandcentral.pcnametag.com;
+    # server_name dev.local.grandcentral.pcnametag.com *.dev.local.grandcentral.pcnametag.com;
+    server_name localhost;
 
     include /etc/nginx/snippets/logging.conf;
 #    include /etc/nginx/snippets/letsencrypt-handler.conf;
@@ -10,7 +11,7 @@ server {
     include /etc/nginx/snippets/php-locations.conf;
     include /etc/nginx/snippets/disablecaching.conf;
 
-    root /var/www/laravel/public;
+    root /var/www/public;
 
     index index.php index.html index.htm;
 
