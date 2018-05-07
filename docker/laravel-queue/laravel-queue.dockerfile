@@ -1,6 +1,6 @@
-FROM vcarreira/php7
+FROM benyanke/php7:7.2
 
-MAINTAINER "Vitor Carreira" <vitor.carreira@gmail.com>
+MAINTAINER "Ben Yanke" <ben@benyanke.com>
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     supervisor \

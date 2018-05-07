@@ -1,4 +1,4 @@
-FROM vcarreira/nginx-php7-fpm:latest
+FROM benyanke/nginx-php7-fpm:latest
 
 MAINTAINER "Ben Yanke" <ben@benyanke.com>
 

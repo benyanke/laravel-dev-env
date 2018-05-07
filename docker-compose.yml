@@ -8,25 +8,22 @@ services:
   # Webserver
   app:
     container_name: ${DOCKER_COMPOSE_APP_NAME}-httpd
-    # image: vcarreira/nginx-php7-fpm
-    image: benyanke/docker-nginx-php7-fpm:latest
-    # build:
-    #  context: ./docker/nginx
-    #  dockerfile: Dockerfile
+    image: benyanke/nginx-php7-fpm:latest
     ports:
       - 8080:80
     # user: "${UID}:${GID}"
     expose:
       - 80
     environment:
-      - UID=${UID}
-      - GID=${GID}
+      - UID=${UID:-1000}
+      - GID=${GID:-1000}
     volumes:
       - ./www:/var/www
       - ./docker/nginx/sites:/etc/nginx/sites-enabled
       - ./docker/nginx/logs:/var/log/nginx/
       - ./docker/nginx/snippets:/etc/nginx/snippets
-      - ./docker/nginx/fpm/pool.d:/etc/php/7.1/fpm/pool.d
+      - ./docker/nginx/fpm/pool.d:/etc/php/7.2/fpm/pool.d
+      - ./docker/nginx/startup.sh:/opt/startup/startup.sh
     links:
       - db:${DB_HOST}
       - redis:${REDIS_HOST}
@@ -37,8 +34,8 @@ services:
       - redis
       - queue-daemon
       - phpmyadmin
-    env_file:
-      - .local.env
+    # env_file:
+    #  - .local.env
 
   db:
     container_name: ${DOCKER_COMPOSE_APP_NAME}-db
@@ -130,6 +127,7 @@ services:
       - db
       - redis
 
+  # This isn't fully there - keeping it so we can get it added later
   phpspec:
     image: vcarreira/phpspec
     volumes:
@@ -140,6 +138,7 @@ services:
     networks:
       - laravel-network
 
+  # This is probably not needed anymore - composer is installed in the app container
   composer:
     image: vcarreira/composer
     volumes:
@@ -149,6 +148,7 @@ services:
     networks:
       - laravel-network
 
+  # This isn't fully there - keeping it so we can get it added later
   node:
     image: vcarreira/node
     volumes:
