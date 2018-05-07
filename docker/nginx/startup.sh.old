@@ -17,7 +17,6 @@ export OWN_USER="www-data"
 usermod  -u "$UID" "$OWN_USER"
 groupmod -g "$GID" "$OWN_USER"
 
-
 # Fix filesystem permissions based on UID/GID provided by ENV
 if [ "$RUN_PERMISSION_FIX" = "1" ] ; then
   echo "Running permission fix";
@@ -33,9 +32,8 @@ if [ "$RUN_COMPOSER" = "1" ] ; then
   echo "Running composer install";
   (cd "$CMD_DIR" ; composer install --no-interaction )
 else
-  echo "Skipping composer install";
+  echo "Skipping composer install;
 fi
-
 
 # Run Webpack
 if [ "$RUN_WEBPACK" = "1" ] ; then
