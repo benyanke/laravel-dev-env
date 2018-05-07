@@ -33,6 +33,7 @@ services:
       - ./docker/nginx/fpm/pool.d:/etc/php/7.2/fpm/pool.d
       - ./docker/nginx/startup.sh:/opt/startup/startup.sh
       - ./docker/.tmp/composer/cache:/root/.composer/cache
+      - ./docker/nginx/supervisor/conf.d:/etc/supervisor/conf.d
       # - ./docker/.tmp/npm/cache:[npm-cache-dir-here]
     links:
       - db:${DB_HOST}
