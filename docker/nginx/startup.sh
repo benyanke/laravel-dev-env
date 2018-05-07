@@ -2,6 +2,13 @@
 # This runs on container startup.
 # Ensure it returns exit code 0, otherwise the container will not continue to startup.
 
+echo ""
+echo "#####################################################"
+echo "       Provisioning App Server Container             "
+echo "#####################################################"
+echo ""
+
+
 # Here is an example command which dumps the current env to /tmp/env
 env > /tmp/env
 
@@ -82,7 +89,11 @@ else
   echo "Skipping Vendor Publish";
 fi
 
-
+echo ""
+echo "#####################################################"
+echo "       Provisioning Complete - starting Nginx/FPM"
+echo "#####################################################"
+echo ""
 
 # Exiting
 exit 0;
