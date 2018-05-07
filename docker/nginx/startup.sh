@@ -54,8 +54,13 @@ fi
 
 # Run DB Migrations
 if [ "$RUN_MIGRATIONS" = "1" ] ; then
-  echo "Running DB Migrations";
+  echo "Running DB migrations (destructive)";
+  (cd "$CMD_DIR" ; $ARTISAN migrate:fresh || exit 1)
+  $ARTISAN migrate:status || exit 1
+elif [ "$RUN_MIGRATIONS_SAFE = "1" ] ; then
+  echo "Running DB migrations (nondestructive)";
   (cd "$CMD_DIR" ; $ARTISAN migrate || exit 1)
+  $ARTISAN migrate:status || exit 1
 else
   echo "Skipping DB Migrations";
 fi
