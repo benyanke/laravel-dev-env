@@ -4,3 +4,10 @@ Install docker
 Install docker-compose
 
 if permission issues persist, set env var UID and GID with the user who should own the filesystem
+
+
+to start:
+docker-compose up -d app
+
+to restart:
+docker-compose down; docker-compose up -d app
