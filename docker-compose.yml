@@ -32,8 +32,8 @@ services:
       - ./docker/nginx/snippets:/etc/nginx/snippets
       - ./docker/nginx/fpm/pool.d:/etc/php/7.2/fpm/pool.d
       - ./docker/nginx/startup.sh:/opt/startup/startup.sh
-      - ./docker/nginx/.tmp/composer/cache:/root/.composer/cache
-      # - ./docker/nginx/.tmp/npm/cache:[npm-cache-dir-here]
+      - ./docker/.tmp/composer/cache:/root/.composer/cache
+      # - ./docker/.tmp/npm/cache:[npm-cache-dir-here]
     links:
       - db:${DB_HOST}
       - redis:${REDIS_HOST}
