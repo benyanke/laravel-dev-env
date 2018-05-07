@@ -17,13 +17,22 @@ services:
     environment:
       - UID=${UID:-1000}
       - GID=${GID:-1000}
+      # DB env bootstrap flags - by default, they're one
+      - RUN_PERMISSION_FIX=${SETUP_DEV_ENV:-1}
+      - RUN_COMPOSER=${SETUP_DEV_ENV:-1}
+      - RUN_WEBPACK=${SETUP_DEV_ENV:-1}
+      - RUN_MIGRATIONS=${SETUP_DEV_ENV:-1}
+      - RUN_DB_SEED=${SETUP_DEV_ENV:-1}
+      - RUN_VENDOR_PUBLISH=${SETUP_DEV_ENV:-1}
     volumes:
-      - ./www:/var/www
+      - ./www:/var/www/laravel
       - ./docker/nginx/sites:/etc/nginx/sites-enabled
       - ./docker/nginx/logs:/var/log/nginx/
       - ./docker/nginx/snippets:/etc/nginx/snippets
       - ./docker/nginx/fpm/pool.d:/etc/php/7.2/fpm/pool.d
       - ./docker/nginx/startup.sh:/opt/startup/startup.sh
+      # - ./docker/nginx/.tmp/composer/cache:[compose-cache-dir-here]
+      # - ./docker/nginx/.tmp/npm/cache:[npm-cache-dir-here]
     links:
       - db:${DB_HOST}
       - redis:${REDIS_HOST}

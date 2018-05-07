@@ -3,7 +3,4 @@
 Install docker
 Install docker-compose
 
-Copy local.env.example to local.env.
-
-run setupEnvFile.sh to create .local.env
-
+if permission issues persist, set env var UID and GID with the user who should own the filesystem

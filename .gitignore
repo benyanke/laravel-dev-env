@@ -1,5 +1,4 @@
 docker/tmp
-local.env
 
 # Composer
 vendor/
