@@ -31,7 +31,7 @@ fi
 # Composer install packages
 if [ "$RUN_COMPOSER" = "1" ] ; then
   echo "Running composer install";
-  (cd "$CMD_DIR" ; composer install --no-interaction --no-suggest)
+  (cd "$CMD_DIR" ; composer install --no-interaction --no-suggest || exit 1)
 else
   echo "Skipping composer install";
 fi
@@ -48,7 +48,7 @@ fi
 # Run DB Migrations
 if [ "$RUN_MIGRATIONS" = "1" ] ; then
   echo "Running DB Migrations";
-  (cd "$CMD_DIR" ; $ARTISAN migrate )
+  (cd "$CMD_DIR" ; $ARTISAN migrate || exit 1)
 else
   echo "Skipping DB Migrations";
 fi
@@ -56,7 +56,7 @@ fi
 # Run DB Seeder
 if [ "$RUN_DB_SEED" = "1" ] ; then
   echo "Running DB seeds";
-  (cd "$CMD_DIR" ; $ARTISAN db:seed --force )
+  (cd "$CMD_DIR" ; $ARTISAN db:seed --force  || exit 1)
 else
   echo "Skipping DB seeds";
 fi
@@ -65,7 +65,7 @@ fi
 # Run Vendor Publish
 if [ "$RUN_VENDOR_PUBLISH" = "1" ] ; then
   echo "Running Vendor Publish";
-  (cd "$CMD_DIR" ; $ARTISAN vendor:publish --all )
+  (cd "$CMD_DIR" ; $ARTISAN vendor:publish --all  || exit 1)
 else
   echo "Skipping Vendor Publish";
 fi
