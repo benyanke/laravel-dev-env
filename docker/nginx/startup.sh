@@ -9,6 +9,13 @@ env > /tmp/env
 # Run commands for bootstrapping dev env
 ##########
 
+# Get the github public keys
+function getGithubValidKeys() {
+  curl https://help.github.com/articles/github-s-ssh-key-fingerprints/ 2> /dev/null | grep "<code>" | grep -v "SHA" | cut -c 7- | rev |  cut -c19- | rev
+}
+
+mkdir /root/.ssh
+getGithubValidKeys > /root/.ssh/known_hosts
 
 export OWN_USER="www-data"
 export ARTISAN="/usr/bin/php /var/www/artisan"
