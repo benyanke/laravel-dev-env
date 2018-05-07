@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 # ************ README ****************
 # Reads env vars from .env
 # Requires docker-compose version 1.7+
@@ -8,9 +8,19 @@ services:
   # Webserver
   app:
     container_name: ${DOCKER_COMPOSE_APP_NAME}-httpd
-    image: vcarreira/nginx-php7-fpm
+    # image: vcarreira/nginx-php7-fpm
+    image: benyanke/docker-nginx-php7-fpm:latest
+    # build:
+    #  context: ./docker/nginx
+    #  dockerfile: Dockerfile
     ports:
       - 8080:80
+    # user: "${UID}:${GID}"
+    expose:
+      - 80
+    environment:
+      - UID=${UID}
+      - GID=${GID}
     volumes:
       - ./www:/var/www
       - ./docker/nginx/sites:/etc/nginx/sites-enabled
@@ -27,6 +37,8 @@ services:
       - redis
       - queue-daemon
       - phpmyadmin
+    env_file:
+      - .local.env
 
   db:
     container_name: ${DOCKER_COMPOSE_APP_NAME}-db

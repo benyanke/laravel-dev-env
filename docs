@@ -1,0 +1,12 @@
+# TODO:
+
+Install docker
+Install docker-compose
+
+Copy local.env.example to local.env.
+
+
+Add these to bashrc file, or run in shell before starting
+  export GID
+  export UID
+
