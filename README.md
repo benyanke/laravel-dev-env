@@ -22,7 +22,7 @@ This docker-compose development environment provides the following services:
   `docker-compose.yml` file, as well as all the containers listed in the `app`
   section's `depends_on` clause.
 
-    `docker-compose up -d app`
+    docker-compose up -d app
 
   The main app/httpd container will not begin serving web requests immediately,
   as it first must install composer and NPM packages, etc. This will begin to
@@ -37,7 +37,7 @@ This docker-compose development environment provides the following services:
 
   To stop, run:
 
-    `docker-compose down`
+    docker-compose down
 
   This will stop and delete all the environment's containers.
   NOTE: This removes all transient state of the containers, such as the database.
@@ -45,34 +45,48 @@ This docker-compose development environment provides the following services:
 ### Temporary Start/Stop
   The stack can be paused and unpaused with the following commands:
 
-    `docker-compose pause`  
-    `docker-compose unpause`  
+    docker-compose pause
+    docker-compose unpause
 
 ### Additional Useful Commands
+
+  #### Port Override
+
+  To override one of the services' external port, specify an environment
+  variable before the `docker-compose up` command. For example, to change
+  the web frontend and phpMyAdmin to a different port:
+
+    PORT_APP=80 PORT_PMA=81 docker-compose up -d app
+
+  These can be made permanent on a systemwide basis by adding lines to ~/.bashrc:
+
+	export PORT_APP=80;
+    export PORT_PMA=81;
+
   #### Run a command in a container:
 
-    `docker-compose exec [container name] [command]`
+    docker-compose exec [container name] [command]
 
   #### Enter main app server with a bash shell
 
-    `docker-compose exec app /bin/bash`
+    docker-compose exec app /bin/bash
 
   ##### View nginx access logs
 
-    `docker-compose exec app tail -f /var/log/nginx/access.log`
+    docker-compose exec app tail -f /var/log/nginx/access.log
 
   ##### Artisan
 
   _can also start bash, as above, then run from the container's shell_
 
-    `docker-compose exec app php /var/www/artisan`
+    docker-compose exec app php /var/www/artisan
 
   #### View a container's primary log
 
   View container 'syslogs'. Additionally, omit container name to view all
   container's logs
 
-    `docker-compose logs -f [container name]`
+    docker-compose logs -f [container name]
 
 
   When in doubt, run bash in a container and start looking around. For most
@@ -83,5 +97,5 @@ This docker-compose development environment provides the following services:
 ## Additional Notes
   If you are experiencing odd issues, rebuilding the environment with new
   containers can typically be helpful.
-  
-    `docker-compose down; docker-compose up -d app`
+
+    docker-compose down; docker-compose up -d app
