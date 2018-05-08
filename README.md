@@ -66,7 +66,7 @@ This docker-compose development environment provides the following services:
 
  To avoid the inconvenience of having to add these every time, these can be made permanent on a systemwide basis by adding lines to ~/.bashrc:
 
-	  export PORT_APP=80;
+    export PORT_APP=80;
     export PORT_PMA=81;
 
   **Run a command in a container**
