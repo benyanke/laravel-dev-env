@@ -17,11 +17,12 @@ This docker-compose development environment provides the following services:
   * Redis Commander - redis admin interface
     * Default: `127.0.0.1:8083`, override with `PORT_REDISADMIN`
 
-### Start development environment
-  `docker-compose up -d app`
+### Start/Stop Development Environment
   This creates the container called 'app' (the application server) in the
   `docker-compose.yml` file, as well as all the containers listed in the `app`
   section's `depends_on` clause.
+
+    `docker-compose up -d app`
 
   The main app/httpd container will not begin serving web requests immediately,
   as it first must install composer and NPM packages, etc. This will begin to
@@ -34,10 +35,12 @@ This docker-compose development environment provides the following services:
   This will take several minutes to run the first time, as it downloads each
   container. After the first run, it completes in about 7 seconds.
 
-### Stop development environment
-  `docker-compose down`
+  To stop, run:
+
+    `docker-compose down`
 
   This will stop and delete all the environment's containers.
+
 
 ### Additional Useful Commands
   #### Run a command in a container:
