@@ -8,6 +8,8 @@ echo "       Provisioning App Server Container             "
 echo "#####################################################"
 echo ""
 
+# Export env file to this shell for the sake of using during provisioning
+export $(egrep -v '^#' $CMD_DIR/.env | xargs)
 
 # Here is an example command which dumps the current env to /tmp/env
 env > /tmp/env
@@ -36,8 +38,6 @@ groupmod -g "$GID" "$OWN_USER"
 if [ "$RUN_PERMISSION_FIX" = "1" ] ; then
   echo "Running permission fix";
   chown -R $UID:$GID "$CMD_DIR"
-  # find "$CMD_DIR" -user "$UID" -exec chown -h "$OWN_USER" {} \;
-  # find "$CMD_DIR" -group "$GID" -exec chgrp -h "$OWN_USER" {} \;
 else
   echo "Skipping permission fix";
 fi
@@ -62,7 +62,7 @@ fi
 # Wait for mysql to come up
 while ! timeout 1 bash -c "cat < /dev/null > /dev/tcp/$DB_HOST/3306 &> /dev/null"; do
     echo "MySQL not online yet. Waiting..."
-    sleep 1;
+    sleep 0.5;
 done
 
 echo ""

@@ -25,7 +25,6 @@ services:
       - RUN_MIGRATIONS=${SETUP_DEV_ENV:-1}
       - RUN_DB_SEED=${SETUP_DEV_ENV:-1}
       - RUN_VENDOR_PUBLISH=${SETUP_DEV_ENV:-1}
-      - DB_HOST=${DB_HOST}
     volumes:
       - ./www/:/var/www/
       - ./docker/nginx/sites:/etc/nginx/sites-enabled
