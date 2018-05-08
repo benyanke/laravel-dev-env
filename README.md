@@ -40,7 +40,13 @@ This docker-compose development environment provides the following services:
     `docker-compose down`
 
   This will stop and delete all the environment's containers.
+  NOTE: This removes all transient state of the containers, such as the database.
 
+### Temporary Start/Stop
+  The stack can be paused and unpaused with the following commands:
+
+    `docker-compose pause`  
+    `docker-compose unpause`  
 
 ### Additional Useful Commands
   #### Run a command in a container:
