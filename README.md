@@ -83,4 +83,5 @@ This docker-compose development environment provides the following services:
 ## Additional Notes
   If you are experiencing odd issues, rebuilding the environment with new
   containers can typically be helpful.
-  `docker-compose down; docker-compose up -d app`
+  
+    `docker-compose down; docker-compose up -d app`
