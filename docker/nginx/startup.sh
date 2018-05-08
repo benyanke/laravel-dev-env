@@ -45,7 +45,7 @@ fi
 # Composer install packages
 if [ "$RUN_COMPOSER" = "1" ] ; then
   echo "Running composer install";
-  (cd "$CMD_DIR" ; composer install --no-progress --no-interaction --no-suggest || exit 1)
+  (cd "$CMD_DIR" ; composer install --optimize-autoloader --no-progress --no-interaction --no-suggest || exit 1)
 else
   echo "Skipping composer install";
 fi

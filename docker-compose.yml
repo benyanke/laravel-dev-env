@@ -38,6 +38,7 @@ services:
     links:
       - db:${DB_HOST}
       - redis:${REDIS_HOST}
+      - phpmyadmin
     networks:
       - laravel-network
     depends_on:
@@ -45,8 +46,6 @@ services:
       - redis
       - queue-daemon
       - phpmyadmin
-    # env_file:
-    #  - .local.env
 
   db:
     container_name: ${DOCKER_COMPOSE_APP_NAME}-db
@@ -81,14 +80,37 @@ services:
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:edge
     container_name: ${DOCKER_COMPOSE_APP_NAME}-pma
+    ports:
+      - ${PORT_PMA:-8081}:80
+    expose:
+      - 80
     environment:
       - PMA_ARBITRARY=1
       - PMA_HOST=${DB_HOST}
       - PMA_USER=root
       - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - PMA_PORT=${DB_PORT}
+    links:
+      - db:${DB_HOST}
+    networks:
+      - laravel-network
+    depends_on:
+      - db
+
+
+  mailcatcher:
+    image: yappabe/mailcatcher:latest
+    container_name: ${DOCKER_COMPOSE_APP_NAME}-mail
     ports:
-      - ${PORT_PMA:-8081}:80
+      - ${PORT_MAIL:-8082}:1080
+    expose:
+      - 1025
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=${DB_HOST}
+      - PMA_USER=root
+      - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - PMA_PORT=${DB_PORT}
     links:
       - db:${DB_HOST}
     networks:
@@ -97,18 +119,21 @@ services:
       - db
 
   queue-daemon:
-    container_name: ${DOCKER_COMPOSE_APP_NAME}-queue-daemon
+    container_name: ${DOCKER_COMPOSE_APP_NAME}-queue
     build:
       context: ./docker/laravel-queue
       dockerfile: laravel-queue.dockerfile
     volumes:
       - ./www:/var/www
-      - ./docker/laravel-queue/logs:/var/log/supervisor
     links:
       - db:${DB_HOST}
       - redis:${REDIS_HOST}
     networks:
       - laravel-network
+    depends_on:
+      - db
+      - redis
+      - mailcatcher
 
   # one-off containers
   # call docker-compose rm -a -f after docker-compose up to remove all one-off containers
