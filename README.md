@@ -34,7 +34,7 @@ This docker-compose development environment provides the following services:
   By default, you can view your running container once it comes up by visiting
   `http://localhost:8080/` in your browser.
 
-  Additionally, this can be run without the `-d` command, which will run int
+  Additionally, this can be run without the `-d` command, which will run in
   front-facing mode, bound to the current terminal, and displaying system logs.
   This can be useful for debugging, but not the desired behavior.
 
