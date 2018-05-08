@@ -40,22 +40,31 @@ This docker-compose development environment provides the following services:
   This will stop and delete all the environment's containers.
 
 ### Additional Useful Commands
-  Run a command in a container:
+  #### Run a command in a container:
+
     `docker-compose exec [container name] [command]`
 
-  For example, to enter main app server:
+  #### Enter main app server with a bash shell
+
     `docker-compose exec app /bin/bash`
 
-  Or view nginx access logs:
+  ##### View nginx access logs
+
     `docker-compose exec app tail -f /var/log/nginx/access.log`
 
-  Artisan
+  ##### Artisan
+
   _can also start bash, as above, then run from the container's shell_
+
     `docker-compose exec app php /var/www/artisan`
+
+  #### View a container's primary log
 
   View container 'syslogs'. Additionally, omit container name to view all
   container's logs
+
     `docker-compose logs -f [container name]`
+
 
   When in doubt, run bash in a container and start looking around. For most
   intents and purposes, a container can be thought of like a VM, containing it's
