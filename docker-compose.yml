@@ -11,7 +11,6 @@ services:
     image: benyanke/nginx-php7-fpm:latest
     ports:
       - ${PORT_APP:-8080}:80
-    # user: "${UID}:${GID}"
     expose:
       - 80
     environment:
@@ -50,6 +49,8 @@ services:
 
   db:
     container_name: ${DOCKER_COMPOSE_APP_NAME}-db
+    ports:
+      - ${PORT_MYSQL:-8036}:3306
     image: mariadb:latest
     expose:
       - 3306
@@ -58,7 +59,7 @@ services:
       - MYSQL_DATABASE=${DB_DATABASE}
       - MYSQL_USER=${DB_USERNAME}
       - MYSQL_PASSWORD=${DB_PASSWORD}
-    # Uncomment these two lines to make DB persistent 
+    # Uncomment these two lines to make DB persistent
     # volumes:
     #  - ./docker/.tmp/db-data:/var/lib/mysql
     networks:

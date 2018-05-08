@@ -6,16 +6,19 @@ full service development environment, allowing quick and easy local development.
 ## Services
 This docker-compose development environment provides the following services:
   * Nginx/PHP-FPM application server with php7.2
-    * Default: `127.0.0.1:8080`, override with `PORT_APP`
+    * Port: `8080`, override with `PORT_APP`
   * MySQL database
+    * Port: `8036`, override with `PORT_MYSQL`
   * Redis cache
+    * No external ports
   * Queue worker
+    * No external ports
   * phpMyAdmin - MySQL web administration tool
-    * Default: `127.0.0.1:8081`, override with `PORT_PMA`
+    * Port: `8081`, override with `PORT_PMA`
   * Mailcatcher - SMTP mail catchall server for development
-    * Default: `127.0.0.1:8082`, override with `PORT_MAIL`
+    * Port: `8082`, override with `PORT_MAIL`
   * Redis Commander - redis admin interface
-    * Default: `127.0.0.1:8083`, override with `PORT_REDISADMIN`
+    * Port: `8083`, override with `PORT_REDISADMIN`
 
 ### Start/Stop Development Environment
   This creates the container called 'app' (the application server) in the
@@ -26,7 +29,10 @@ This docker-compose development environment provides the following services:
 
   The main app/httpd container will not begin serving web requests immediately,
   as it first must install composer and NPM packages, etc. This will begin to
-  respond to web requests 10-30 seconds after the container comes up
+  respond to web requests 10-30 seconds after the container comes up.
+
+  By default, you can view your running container once it comes up by visiting
+  `http://localhost:8080/` in your browser.
 
   Additionally, this can be run without the `-d` command, which will run int
   front-facing mode, bound to the current terminal, and displaying system logs.
@@ -50,7 +56,7 @@ This docker-compose development environment provides the following services:
 
 ### Additional Useful Commands
 
-  #### Port Override
+   **Port Override**
 
   To override one of the services' external port, specify an environment
   variable before the `docker-compose up` command. For example, to change
@@ -58,30 +64,30 @@ This docker-compose development environment provides the following services:
 
     PORT_APP=80 PORT_PMA=81 docker-compose up -d app
 
-  These can be made permanent on a systemwide basis by adding lines to ~/.bashrc:
+ To avoid the inconvenience of having to add these every time, these can be made permanent on a systemwide basis by adding lines to ~/.bashrc:
 
-	export PORT_APP=80;
+	  export PORT_APP=80;
     export PORT_PMA=81;
 
-  #### Run a command in a container:
+  **Run a command in a container**
 
     docker-compose exec [container name] [command]
 
-  #### Enter main app server with a bash shell
+  **Enter main app server with a bash shell**
 
     docker-compose exec app /bin/bash
 
-  ##### View nginx access logs
+  **View nginx access logs**
 
     docker-compose exec app tail -f /var/log/nginx/access.log
 
-  ##### Artisan
+  **Artisan**
 
   _can also start bash, as above, then run from the container's shell_
 
     docker-compose exec app php /var/www/artisan
 
-  #### View a container's primary log
+  **View a container's primary log**
 
   View container 'syslogs'. Additionally, omit container name to view all
   container's logs
