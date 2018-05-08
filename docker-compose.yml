@@ -58,8 +58,9 @@ services:
       - MYSQL_DATABASE=${DB_DATABASE}
       - MYSQL_USER=${DB_USERNAME}
       - MYSQL_PASSWORD=${DB_PASSWORD}
-    volumes:
-      - ./docker/.tmp/db-data:/var/lib/mysql
+    # Uncomment these two lines to make DB persistent 
+    # volumes:
+    #  - ./docker/.tmp/db-data:/var/lib/mysql
     networks:
       - laravel-network
 
