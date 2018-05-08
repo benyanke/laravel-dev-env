@@ -46,6 +46,7 @@ services:
       - redis
       - queue-daemon
       - phpmyadmin
+      - rediscommander
 
   db:
     container_name: ${DOCKER_COMPOSE_APP_NAME}-db
@@ -96,7 +97,6 @@ services:
       - laravel-network
     depends_on:
       - db
-
 
   mailcatcher:
     image: yappabe/mailcatcher:latest
