@@ -59,6 +59,16 @@ else
   echo "Skipping Laravel Mix";
 fi
 
+# Wait for mysql to come up
+while ! timeout 1 bash -c "cat < /dev/null > /dev/tcp/$DB_HOST/3306 &> /dev/null"; do
+    echo "MySQL not online yet. Waiting..."
+    sleep 1;
+done
+
+echo ""
+echo "MySQL online - continuing."
+echo ""
+
 # Run DB Migrations
 if [ "$RUN_MIGRATIONS" = "1" ] ; then
   echo "Running DB migrations (destructive)";
