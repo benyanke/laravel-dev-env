@@ -79,15 +79,13 @@
 
             <div class="content">
                 <div class="title m-b-md">
-                    Laravel
+                    Laravel Test
                 </div>
 
                 <div class="links">
-                    <a href="https://laravel.com/docs">Documentation</a>
-                    <a href="https://laracasts.com">Laracasts</a>
-                    <a href="https://laravel-news.com">News</a>
-                    <a href="https://forge.laravel.com">Forge</a>
-                    <a href="https://github.com/laravel/laravel">GitHub</a>
+                    <a href="http://localhost:8081" target="_blank">PHPMyAdmin</a>
+                    <a href="http://localhost:8082" target="_blank">Mailcatcher</a>
+                    <a href="http://localhost:8083" target="_blank">Redis Commander</a>
                 </div>
             </div>
         </div>
