@@ -64,20 +64,6 @@ services:
     networks:
       - laravel-network
 
-  redis:
-    container_name: ${DOCKER_COMPOSE_APP_NAME}-redis
-    image: vcarreira/redis
-    expose:
-      - 6379
-    environment:
-      - REDIS_PORT=${REDIS_PORT}
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-    command: redis-server --appendonly yes
-    volumes:
-      - ./docker/redis:/data
-    networks:
-      - laravel-network
-
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:edge
     container_name: ${DOCKER_COMPOSE_APP_NAME}-pma
@@ -97,6 +83,38 @@ services:
       - laravel-network
     depends_on:
       - db
+
+
+  redis:
+    container_name: ${DOCKER_COMPOSE_APP_NAME}-redis
+    image: redis:4-alpine
+    expose:
+      - 6379
+    networks:
+      - laravel-network
+
+  # Not quite working yet, but close - look closer when redis is working
+  rediscommander:
+    image:  rediscommander/redis-commander:latest
+    container_name: ${DOCKER_COMPOSE_APP_NAME}-redisadmin
+    ports:
+      - ${PORT_REDISADMIN:-8083}:8081
+    expose:
+      - 8081
+    links:
+      - redis:${REDIS_HOST}
+    environment:
+      - REDIS_HOSTS=${REDIS_HOST}
+      # - REDIS_PORT=${REDIS_PORT}
+      # - REDIS_PASSWORD=${REDIS_PASSWORD}
+      # - REDIS_DB=${REDIS_DB}
+    links:
+      - redis:${REDIS_HOST}
+    networks:
+      - laravel-network
+    depends_on:
+      - redis
+
 
   mailcatcher:
     image: yappabe/mailcatcher:latest
@@ -118,25 +136,6 @@ services:
     depends_on:
       - db
 
-  # Not quite working yet, but close - look closer when redis is working
-  rediscommander:
-    image:  rediscommander/redis-commander:latest
-    container_name: ${DOCKER_COMPOSE_APP_NAME}-redisadmin
-    ports:
-      - ${PORT_REDISADMIN:-8083}:8081
-    expose:
-      - 8081
-    environment:
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-      - REDIS_DB=${REDIS_DB}
-    links:
-      - redis:${REDIS_HOST}
-    networks:
-      - laravel-network
-    depends_on:
-      - redis
 
   queue-daemon:
     container_name: ${DOCKER_COMPOSE_APP_NAME}-queue
@@ -154,65 +153,6 @@ services:
       - db
       - redis
       - mailcatcher
-
-  # one-off containers
-  # call docker-compose rm -a -f after docker-compose up to remove all one-off containers
-  # or simply use the alias dcup
-  artisan:
-    image: vcarreira/artisan
-    volumes:
-      - ./www:/var/www
-    links:
-      - db:${DB_HOST}
-      - redis:${REDIS_HOST}
-    networks:
-      - laravel-network
-    depends_on:
-      - db
-      - redis
-
-  # This isn't fully there - keeping it so we can get it added later
-  phpunit:
-    image: vcarreira/phpunit
-    volumes:
-      - ./www/:/var/www
-    links:
-      - db:${DB_HOST}
-      - redis:${REDIS_HOST}
-    networks:
-      - laravel-network
-    depends_on:
-      - db
-      - redis
-
-  # This isn't fully there - keeping it so we can get it added later
-  phpspec:
-    image: vcarreira/phpspec
-    volumes:
-      - ./www:/var/www
-    links:
-      - db:${DB_HOST}
-      - redis:${REDIS_HOST}
-    networks:
-      - laravel-network
-
-  # This is probably not needed anymore - composer is installed in the app container
-  composer:
-    image: vcarreira/composer
-    volumes:
-      - ./www:/var/www
-      # - ./docker/.tmp/composer/cache:/root/.composer/cache
-      - ./docker/.tmp/composer:/root/.composer
-    networks:
-      - laravel-network
-
-  # This isn't fully there - keeping it so we can get it added later
-  node:
-    image: vcarreira/node
-    volumes:
-      - ./www:/var/www
-    networks:
-      - laravel-network
 
 networks:
   laravel-network:
