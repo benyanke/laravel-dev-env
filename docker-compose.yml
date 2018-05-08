@@ -118,6 +118,26 @@ services:
     depends_on:
       - db
 
+  # Not quite working yet, but close - look closer when redis is working
+  rediscommander:
+    image:  rediscommander/redis-commander:latest
+    container_name: ${DOCKER_COMPOSE_APP_NAME}-redisadmin
+    ports:
+      - ${PORT_REDISADMIN:-8083}:8081
+    expose:
+      - 8081
+    environment:
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_DB=${REDIS_DB}
+    links:
+      - redis:${REDIS_HOST}
+    networks:
+      - laravel-network
+    depends_on:
+      - redis
+
   queue-daemon:
     container_name: ${DOCKER_COMPOSE_APP_NAME}-queue
     build:

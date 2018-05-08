@@ -19,6 +19,7 @@ To override default ports for frontend:
 PORT_APP = default 8080
 PORT_PMA = default 8081
 PORT_MAIL = default 8082
+PORT_REDISADMIN = default 8083
 
 
 PORT_APP=8082 PORT_PMA=8083 docker-compose up -d app
