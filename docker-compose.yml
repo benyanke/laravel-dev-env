@@ -1,0 +1,162 @@
+version: '3'
+# ************ README ****************
+# Reads env vars from .env
+# Requires docker-compose version 1.7+
+# ************************************
+
+services:
+  # Webserver
+  app:
+    container_name: ${DOCKER_COMPOSE_APP_NAME}-httpd
+    image: benyanke/nginx-php7-fpm:latest
+    ports:
+      - ${PORT_APP:-8080}:80
+    expose:
+      - 80
+    environment:
+      - UID=${UID:-1000}
+      - GID=${GID:-1000}
+      # DB env bootstrap flags - by default, they're enabled
+      - CMD_DIR=/var/www
+      - RUN_PERMISSION_FIX=${SETUP_DEV_ENV:-1}
+      - RUN_COMPOSER=${SETUP_DEV_ENV:-1}
+      - RUN_WEBPACK=${SETUP_DEV_ENV:-1}
+      - RUN_MIGRATIONS=${SETUP_DEV_ENV:-1}
+      - RUN_DB_SEED=${SETUP_DEV_ENV:-1}
+      - RUN_VENDOR_PUBLISH=${SETUP_DEV_ENV:-1}
+    volumes:
+      - ./www/:/var/www/
+      - ./docker/nginx/sites:/etc/nginx/sites-enabled
+      - ./docker/nginx/logs:/var/log/nginx/
+      - ./docker/nginx/snippets:/etc/nginx/snippets
+      - ./docker/nginx/fpm/pool.d:/etc/php/7.2/fpm/pool.d
+      - ./docker/nginx/startup.sh:/opt/startup/startup.sh
+      - ./docker/.tmp/composer/cache:/root/.composer/cache
+      - ./docker/nginx/supervisor/conf.d:/etc/supervisor/conf.d
+      # - ./docker/.tmp/npm/cache:[npm-cache-dir-here]
+    links:
+      - db:${DB_HOST}
+      - redis:${REDIS_HOST}
+      - phpmyadmin
+    networks:
+      - laravel-network
+    depends_on:
+      - db
+      - redis
+      - queue
+      - phpmyadmin
+      - rediscommander
+
+  db:
+    container_name: ${DOCKER_COMPOSE_APP_NAME}-db
+    ports:
+      - ${PORT_MYSQL:-8036}:3306
+    image: mariadb:latest
+    expose:
+      - 3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_DATABASE}
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    # Uncomment these two lines to make DB persistent
+    # volumes:
+    #  - ./docker/.tmp/db-data:/var/lib/mysql
+    networks:
+      - laravel-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:edge
+    container_name: ${DOCKER_COMPOSE_APP_NAME}-pma
+    ports:
+      - ${PORT_PMA:-8081}:80
+    expose:
+      - 80
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=${DB_HOST}
+      - PMA_USER=root
+      - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - PMA_PORT=${DB_PORT}
+    links:
+      - db:${DB_HOST}
+    networks:
+      - laravel-network
+    depends_on:
+      - db
+
+
+  redis:
+    container_name: ${DOCKER_COMPOSE_APP_NAME}-redis
+    image: redis:4-alpine
+    expose:
+      - 6379
+    networks:
+      - laravel-network
+
+  # Not quite working yet, but close - look closer when redis is working
+  rediscommander:
+    image:  rediscommander/redis-commander:latest
+    container_name: ${DOCKER_COMPOSE_APP_NAME}-redisadmin
+    ports:
+      - ${PORT_REDISADMIN:-8083}:8081
+    expose:
+      - 8081
+    links:
+      - redis:${REDIS_HOST}
+    environment:
+      - REDIS_HOSTS=${REDIS_HOST}
+      # - REDIS_PORT=${REDIS_PORT}
+      # - REDIS_PASSWORD=${REDIS_PASSWORD}
+      # - REDIS_DB=${REDIS_DB}
+    links:
+      - redis:${REDIS_HOST}
+    networks:
+      - laravel-network
+    depends_on:
+      - redis
+
+
+  mailcatcher:
+    image: yappabe/mailcatcher:latest
+    container_name: ${DOCKER_COMPOSE_APP_NAME}-mail
+    ports:
+      - ${PORT_MAIL:-8082}:1080
+    expose:
+      - 1025
+    environment:
+      - PMA_ARBITRARY=1
+      - PMA_HOST=${DB_HOST}
+      - PMA_USER=root
+      - PMA_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - PMA_PORT=${DB_PORT}
+    links:
+      - db:${DB_HOST}
+    networks:
+      - laravel-network
+    depends_on:
+      - db
+
+  queue:
+    container_name: ${DOCKER_COMPOSE_APP_NAME}-queue
+    build:
+      context: ./docker/laravel-queue
+      dockerfile: laravel-queue.dockerfile
+    volumes:
+      - ./www:/var/www
+    links:
+      - db:${DB_HOST}
+      - redis:${REDIS_HOST}
+    environment:
+        # This selector not yet implemented - it will specify the number of worker threads to run within this container
+      - QUEUE_WORKERS=3
+    networks:
+      - laravel-network
+    depends_on:
+      - db
+      - redis
+      - mailcatcher
+
+networks:
+  laravel-network:
+    driver: bridge
