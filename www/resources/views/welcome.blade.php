@@ -79,13 +79,11 @@
 
             <div class="content">
                 <div class="title m-b-md">
-                    Laravel Test
+                    Laravel Env for HumanWorx
                 </div>
 
                 <div class="links">
-                    <a href="http://localhost:8081" target="_blank">PHPMyAdmin</a>
-                    <a href="http://localhost:8082" target="_blank">Mailcatcher</a>
-                    <a href="http://localhost:8083" target="_blank">Redis Commander</a>
+                    <a href="https://www.humanworx.solutions" target="_blank">HumanWorx</a>
                 </div>
             </div>
         </div>
