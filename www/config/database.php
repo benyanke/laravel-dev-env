@@ -1,5 +1,25 @@
 <?php
 
+// Config DB for non-prod environments on elastic beanstalk
+
+if(!function_exists('setRdsVar')) {
+  function setRdsVar($varname, $default = null) {
+    if(defined($varname) == false) {
+      if( ( ! isset($_SERVER[$varname]) || strlen($_SERVER[$varname]) < 1) && $default != null) {
+        define($varname, $default);
+      } else {
+        define($varname, isset($_SERVER[$varname]) ? $_SERVER[$varname] :  '');
+      }
+    }
+  }
+}
+
+setRdsVar('RDS_HOSTNAME');
+setRdsVar('RDS_READ_HOSTNAME', RDS_HOSTNAME);
+setRdsVar('RDS_DB_NAME');
+setRdsVar('RDS_USERNAME');
+setRdsVar('RDS_PASSWORD');
+
 return [
 
     /*
@@ -33,50 +53,29 @@ return [
 
     'connections' => [
 
-        'sqlite' => [
-            'driver' => 'sqlite',
-            'database' => env('DB_DATABASE', database_path('database.sqlite')),
-            'prefix' => '',
-        ],
-
         'mysql' => [
             'driver' => 'mysql',
-            'host' => env('DB_HOST', '127.0.0.1'),
+            'write' => [
+                 'host' => env('DB_HOST', RDS_HOSTNAME),
+            ],
+            'read' => [
+                'host' => RDS_READ_HOSTNAME ?: RDS_HOSTNAME ?: env('DB_READ_HOST', env('DB_HOST', RDS_HOSTNAME)),
+            ],
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
+            'database' => env('DB_DATABASE', RDS_DB_NAME),
+            'username' => env('DB_USERNAME', RDS_USERNAME),
+            'password' => env('DB_PASSWORD', RDS_PASSWORD),
             'unix_socket' => env('DB_SOCKET', ''),
-            'charset' => 'utf8mb4',
-            'collation' => 'utf8mb4_unicode_ci',
+
+            'charset'   => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            //'charset' => 'utf8mb4',           'collation' => 'utf8mb4_unicode_ci',
             'prefix' => '',
             'strict' => true,
             'engine' => null,
+            'sticky' => true,
         ],
 
-        'pgsql' => [
-            'driver' => 'pgsql',
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'port' => env('DB_PORT', '5432'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
-            'charset' => 'utf8',
-            'prefix' => '',
-            'schema' => 'public',
-            'sslmode' => 'prefer',
-        ],
-
-        'sqlsrv' => [
-            'driver' => 'sqlsrv',
-            'host' => env('DB_HOST', 'localhost'),
-            'port' => env('DB_PORT', '1433'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
-            'password' => env('DB_PASSWORD', ''),
-            'charset' => 'utf8',
-            'prefix' => '',
-        ],
 
     ],
 
