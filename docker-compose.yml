@@ -105,10 +105,7 @@ services:
     links:
       - redis:${REDIS_HOST}
     environment:
-      - REDIS_HOSTS=${REDIS_HOST}
-      # - REDIS_PORT=${REDIS_PORT}
-      # - REDIS_PASSWORD=${REDIS_PASSWORD}
-      # - REDIS_DB=${REDIS_DB}
+      - REDIS_HOSTS=cache:${REDIS_HOST}:${REDIS_PORT}:${REDIS_DB_CACHE},queue:${REDIS_HOST}:${REDIS_PORT}:${REDIS_DB_QUEUE},sessions:${REDIS_HOST}:${REDIS_PORT}:${REDIS_DB_SESSIONS},default:${REDIS_HOST}:${REDIS_PORT}:0
     links:
       - redis:${REDIS_HOST}
     networks:

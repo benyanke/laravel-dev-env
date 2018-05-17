@@ -70,7 +70,8 @@ return [
     |
     */
 
-    'connection' => null,
+    // Use redis-sessions if driver is redis, otherwise use null
+    'connection' => env('SESSION_DRIVER') == 'redis' ? 'redis-sessions' : null,
 
     /*
     |--------------------------------------------------------------------------
