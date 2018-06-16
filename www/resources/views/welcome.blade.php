@@ -79,11 +79,11 @@
 
             <div class="content">
                 <div class="title m-b-md">
-                    Laravel Env for HumanWorx
+                    Laravel Dev Env
                 </div>
 
                 <div class="links">
-                    <a href="https://www.humanworx.solutions" target="_blank">HumanWorx</a>
+                    <a href="https://laravel.com" target="_blank">Laravel Website</a>
                 </div>
             </div>
         </div>
