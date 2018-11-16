@@ -1,4 +1,4 @@
-FROM benyanke/php7:7.2
+FROM benyanke/php7:7.3
 
 MAINTAINER "Ben Yanke" <ben@benyanke.com>
 

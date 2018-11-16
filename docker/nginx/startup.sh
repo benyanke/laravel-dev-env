@@ -2,6 +2,15 @@
 # This runs on container startup.
 # Ensure it returns exit code 0, otherwise the container will not continue to startup.
 
+# Error handler to use like 'cmd || errHandler'
+function errHandler() {
+  echo ""
+  echo "COMMAND FAILURE - EXITING!!"
+  echo ""
+  exit 1;
+}
+
+
 echo ""
 echo "#####################################################"
 echo "       Provisioning App Server Container             "
@@ -19,12 +28,13 @@ env > /tmp/env
 ##########
 
 # Get the github public keys
+# TODO : Refactor this travesty of key handling
 function getGithubValidKeys() {
   curl https://help.github.com/articles/github-s-ssh-key-fingerprints/ 2> /dev/null | grep "<code>" | grep -v "SHA" | cut -c 7- | rev |  cut -c19- | rev
 }
 
 mkdir /root/.ssh
-getGithubValidKeys > /root/.ssh/known_hosts
+getGithubValidKeys > /root/.ssh/known_hosts || errHandler
 
 export OWN_USER="www-data"
 export ARTISAN="/usr/bin/php /var/www/artisan"
@@ -45,7 +55,7 @@ fi
 # Composer install packages
 if [ "$RUN_COMPOSER" = "1" ] ; then
   echo "Running composer install";
-  (cd "$CMD_DIR" ; composer install --optimize-autoloader --no-progress --no-interaction --no-suggest || exit 1)
+  (cd "$CMD_DIR" ; composer install --optimize-autoloader --no-progress --no-interaction --no-suggest || exit 1) || errHandler
 else
   echo "Skipping composer install";
 fi
@@ -72,12 +82,12 @@ echo ""
 # Run DB Migrations
 if [ "$RUN_MIGRATIONS" = "1" ] ; then
   echo "Running DB migrations (destructive)";
-  (cd "$CMD_DIR" ; $ARTISAN migrate:fresh || exit 1)
-  $ARTISAN migrate:status || exit 1
+  (cd "$CMD_DIR" ; $ARTISAN migrate:fresh || exit 1) || errHandler
+  $ARTISAN migrate:status || errHandler
 elif [ "$RUN_MIGRATIONS_SAFE" = "1" ] ; then
   echo "Running DB migrations (nondestructive)";
-  (cd "$CMD_DIR" ; $ARTISAN migrate || exit 1)
-  $ARTISAN migrate:status || exit 1
+  (cd "$CMD_DIR" ; $ARTISAN migrate || exit 1) || errHandler
+  $ARTISAN migrate:status || errHandler
 else
   echo "Skipping DB Migrations";
 fi
@@ -85,7 +95,7 @@ fi
 # Run DB Seeder
 if [ "$RUN_DB_SEED" = "1" ] ; then
   echo "Running DB seeds";
-  (cd "$CMD_DIR" ; $ARTISAN db:seed --force  || exit 1)
+  (cd "$CMD_DIR" ; $ARTISAN db:seed --force  || exit 1) || errHandler
 else
   echo "Skipping DB seeds";
 fi
@@ -94,7 +104,7 @@ fi
 # Run Vendor Publish
 if [ "$RUN_VENDOR_PUBLISH" = "1" ] ; then
   echo "Running Vendor Publish";
-  (cd "$CMD_DIR" ; $ARTISAN vendor:publish --all  || exit 1)
+  (cd "$CMD_DIR" ; $ARTISAN vendor:publish --all  || exit 1) || errHandler
 else
   echo "Skipping Vendor Publish";
 fi
