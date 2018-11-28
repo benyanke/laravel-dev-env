@@ -33,7 +33,7 @@ function getGithubValidKeys() {
   curl https://help.github.com/articles/github-s-ssh-key-fingerprints/ 2> /dev/null | egrep -o '([0-9a-f]{2}:){15}[0-9a-f]{2}'
 }
 
-mkdir /root/.ssh
+mkdir /root/.ssh 2> /dev/null
 getGithubValidKeys > /root/.ssh/known_hosts || errHandler
 
 export OWN_USER="www-data"
