@@ -10,12 +10,54 @@ function errHandler() {
   exit 1;
 }
 
+function banner() {
+  padCount="10"
+  msg="$pad$1$pad"
+  charCt="$(echo $msg | wc -c)"
 
-echo ""
-echo "#####################################################"
-echo "       Provisioning App Server Container             "
-echo "#####################################################"
-echo ""
+  echo ""
+  for i in `seq $padCount`; do printf "#";done
+  for i in `seq $charCt`; do printf "#";done
+  for i in `seq $padCount`; do printf "#";done
+  echo ""
+  for i in `seq $padCount`; do printf "#";done
+  for i in `seq $charCt`; do printf "#";done
+  for i in `seq $padCount`; do printf "#";done
+  echo ""
+  for i in `seq $padCount`; do printf " ";done
+  echo "$@"
+  for i in `seq $padCount`; do printf "#";done
+  for i in `seq $charCt`; do printf "#";done
+  for i in `seq $padCount`; do printf "#";done
+  echo ""
+  for i in `seq $padCount`; do printf "#";done
+  for i in `seq $charCt`; do printf "#";done
+  for i in `seq $padCount`; do printf "#";done
+  echo ""
+  echo ""
+}
+
+function msg() {
+  padCount="2"
+  msg="$pad$1$pad"
+  charCt="$(echo $msg | wc -c)"
+
+  echo ""
+  for i in `seq $padCount`; do printf "#";done
+  for i in `seq $charCt`; do printf "#";done
+  for i in `seq $padCount`; do printf "#";done
+  echo ""
+  for i in `seq $padCount`; do printf " ";done
+  echo " $@"
+  for i in `seq $padCount`; do printf "#";done
+  for i in `seq $charCt`; do printf "#";done
+  for i in `seq $padCount`; do printf "#";done
+  echo ""
+  echo ""
+
+}
+
+banner "Provisioning App Server Container"
 
 # Export env file to this shell for the sake of using during provisioning
 export $(egrep -v '^#' $CMD_DIR/.env | xargs)
@@ -46,67 +88,66 @@ groupmod -g "$GID" "$OWN_USER"
 
 # Fix filesystem permissions based on UID/GID provided by ENV
 if [ "$RUN_PERMISSION_FIX" = "1" ] ; then
-  echo "Running permission fix";
+  msg "Running permission fix";
   chown -R $UID:$GID "$CMD_DIR"
 else
-  echo "Skipping permission fix";
+  msg "Skipping permission fix";
 fi
 
 # Composer install packages
 if [ "$RUN_COMPOSER" = "1" ] ; then
-  echo "Running composer install";
+  msg "Running composer install";
   (cd "$CMD_DIR" ; composer install --optimize-autoloader --no-progress --no-interaction --no-suggest || exit 1) || errHandler
 else
-  echo "Skipping composer install";
+  msg "Skipping composer install";
 fi
 
 
 # Run Webpack
 if [ "$RUN_WEBPACK" = "1" ] ; then
-  echo "Running Laravel Mix";
+  msg "Running Laravel Mix";
   (cd "$CMD_DIR" ; echo "Not yet implemented" )
 else
-  echo "Skipping Laravel Mix";
+  msg "Skipping Laravel Mix";
 fi
 
 # Wait for mysql to come up
+msg "Waiting for MySQL to come online";
 while ! timeout 1 bash -c "cat < /dev/null > /dev/tcp/$DB_HOST/3306 &> /dev/null"; do
     echo "MySQL not online yet. Waiting..."
     sleep 0.5;
 done
 
-echo ""
-echo "MySQL online - continuing."
-echo ""
+msg "MySQL online - continuing."
 
 # Run DB Migrations
 if [ "$RUN_MIGRATIONS" = "1" ] ; then
-  echo "Running DB migrations (destructive)";
+  msg "Running DB migrations (destructive)";
   (cd "$CMD_DIR" ; $ARTISAN migrate:fresh || exit 1) || errHandler
   $ARTISAN migrate:status || errHandler
 elif [ "$RUN_MIGRATIONS_SAFE" = "1" ] ; then
-  echo "Running DB migrations (nondestructive)";
+  msg "Running DB migrations (nondestructive)";
   (cd "$CMD_DIR" ; $ARTISAN migrate || exit 1) || errHandler
   $ARTISAN migrate:status || errHandler
 else
-  echo "Skipping DB Migrations";
+  msg "Skipping DB Migrations";
 fi
 
 # Run DB Seeder
 if [ "$RUN_DB_SEED" = "1" ] ; then
-  echo "Running DB seeds";
+  msg "Running DB seeds";
   (cd "$CMD_DIR" ; $ARTISAN db:seed --force  || exit 1) || errHandler
 else
-  echo "Skipping DB seeds";
+  msg "Skipping DB seeds";
 fi
 
 
 # Run Vendor Publish
 if [ "$RUN_VENDOR_PUBLISH" = "1" ] ; then
-  echo "Running Vendor Publish";
+  msg "Running Vendor Publish";
   (cd "$CMD_DIR" ; $ARTISAN vendor:publish --all  || exit 1) || errHandler
 else
-  echo "Skipping Vendor Publish";
+  msg "Skipping Vendor Publish";
 fi
 
 echo ""
