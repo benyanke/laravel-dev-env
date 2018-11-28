@@ -30,7 +30,7 @@ env > /tmp/env
 # Get the github public keys
 # TODO : Refactor this travesty of key handling
 function getGithubValidKeys() {
-  curl https://help.github.com/articles/github-s-ssh-key-fingerprints/ 2> /dev/null | grep "<code>" | grep -v "SHA" | cut -c 7- | rev |  cut -c19- | rev
+  curl https://help.github.com/articles/github-s-ssh-key-fingerprints/ 2> /dev/null | egrep -o '([0-9a-f]{2}:){15}[0-9a-f]{2}'
 }
 
 mkdir /root/.ssh
