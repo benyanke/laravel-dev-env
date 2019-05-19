@@ -70,13 +70,31 @@ env > /tmp/env
 ##########
 
 # Get the github public keys
-# TODO : Refactor this travesty of key handling
 function getGithubValidKeys() {
-  curl https://help.github.com/articles/github-s-ssh-key-fingerprints/ 2> /dev/null | egrep -o '([0-9a-f]{2}:){15}[0-9a-f]{2}'
+
+  fetchFailure="0";
+
+  # Retry on-failure up to 10 times
+  for i in {1..10} ; do
+
+    timeout 10 ssh-keyscan github.com > /root/.ssh/known_hosts && break
+
+    echo "Github request failed - waiting a second and trying again. This is attempt $i"
+    fetchFailure="1";
+    sleep 1;
+
+  done
+
+  # Only display this if there was a failure
+  if [[ "$fetchFailure" = "1" ]] ; then
+    echo "Github keys fetched successfully."
+  fi
+
 }
 
+msg "Getting host keys for github for composer package fetches"
 mkdir /root/.ssh 2> /dev/null
-getGithubValidKeys > /root/.ssh/known_hosts || errHandler
+getGithubValidKeys || errHandler
 
 export OWN_USER="www-data"
 export ARTISAN="/usr/bin/php /var/www/artisan"
